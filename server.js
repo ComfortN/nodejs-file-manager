@@ -35,12 +35,27 @@ const writeData = (data) => {
 const server = http.createServer((req, res) => {
     // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
+    
+
+    // Handle GET request to retrieve the shopping list
+    if (req.method === 'GET' && req.url === '/shopping-list') {
+        try {
+            const data = readData();
+            console.log('Get the items:', data);
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(data));
+        } catch (error) {
+            console.error('Error retrieving shopping list:', error);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Internal Server Error' }));
+        }
+    }
 
     // Handle POST request to add an item to the shopping list
-    if (req.method === 'POST' && req.url === '/shopping-list') {
+    else if (req.method === 'POST' && req.url === '/shopping-list') {
         let body = '';
         req.on('data', chunk => {
             body += chunk.toString();
